@@ -1,0 +1,23 @@
+<?php
+
+/**
+ * @file
+ * Contains install and update functions for Commerce Mobilpay.
+ */
+
+/**
+ * Implements hook_requirements().
+ */
+function commerce_mobilpay_requirements($phase) {
+  $requirements = [];
+  if ($phase == 'install') {
+    if (!class_exists('\RequestAbstract')) {
+      $requirements['commerce_mobilpay_library'] = [
+        'description' => t('Commerce Mobilpay requires the birkof/netopia-mobilpay-bundle library.'),
+        'severity' => REQUIREMENT_ERROR,
+      ];
+    }
+  }
+
+  return $requirements;
+}

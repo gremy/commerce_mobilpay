@@ -1,0 +1,10 @@
+name: Commerce Mobilpay
+type: module
+description: 'Provides Commerce Payment integration for Mobilpay.'
+package: Commerce (contrib)
+core: 8.x
+configure: entity.commerce_payment_gateway.collection
+dependencies:
+  - commerce:commerce
+  - commerce:commerce_payment
+

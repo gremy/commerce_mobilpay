@@ -1,0 +1,49 @@
+<?php
+
+/**
+ * @file
+ * Hook implementations for Mobilpay module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_theme().
+ */
+function commerce_mobilpay_theme() {
+  return [
+    // List resources.
+    'commerce_mobilpay' => [
+      'variables' => [
+        'errorType' => NULL,
+        'errorCode' => NULL,
+        'errorMessage' => NULL
+      ],
+      'template' => 'commerce_mobilpay',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_help().
+ */
+function commerce_mobilpay_help($route_name, RouteMatchInterface $arg) {
+  switch ($route_name) {
+    case 'help.page.commerce_mobilpay':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('This project integrates mobilpay.ro into the Drupal Commerce payment and checkout systems.') . '</p>';
+
+      // Add a link to the Drupal.org project.
+      $output .= '<p>';
+      $output .= t('Visit the <a href=":project_link">Commerce Mobilpay</a> project pages on Drupal.org for more information.',[
+      ':project_link' => 'https://www.drupal.org/project/commerce_mobilpay'
+      ]);
+      $output .= '</p>';
+
+    return $output;
+  }
+}
+
+// ha test/live ba vagy akkor a kulcsokat ne kelljen ujbol feltegyed
+

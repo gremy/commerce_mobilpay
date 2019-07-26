@@ -1,0 +1,11 @@
+{
+  "name": "drupal/commerce_mobilpay",
+  "type": "drupal-module",
+  "description": "Provides Commerce integration for Mobilpay.",
+  "homepage": "http://drupal.org/project/commerce_mobilpay",
+  "license": "GPL-2.0+",
+  "require": {
+    "drupal/commerce": "~2.0",
+    "birkof/netopia-mobilpay-bundle": "^1.5"
+  }
+}

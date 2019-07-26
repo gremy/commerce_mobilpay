@@ -1,0 +1,12 @@
+commerce_payment.commerce_payment_gateway.plugin.mobilpay_checkout:
+  type: commerce_payment_gateway_configuration
+  mapping:
+    merchant_signature:
+      type: string
+      label: 'Merchant signature'
+    private_key:
+      type: string
+      label: 'Private key'
+    public_key:
+      type: string
+      label: 'Public key'
