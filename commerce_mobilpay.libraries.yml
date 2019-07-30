@@ -1,7 +1,7 @@
 commerce_mobilpay:
-  remote: https://github.com/birkof/netopia-mobilpay-bundle
-  version: "^1.5"
+  remote: https://github.com/birkof/netopia-mobilpay
+  version: "^2.1.0
   license:
-    name: Apache License, Version 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0
-    gpl-compatible: false
+    name: MIT
+    url: https://github.com/birkof/netopia-mobilpay/blob/master/LICENSE.md
+    gpl-compatible: true
