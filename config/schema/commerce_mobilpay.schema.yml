@@ -4,9 +4,15 @@ commerce_payment.commerce_payment_gateway.plugin.mobilpay_checkout:
     merchant_signature:
       type: string
       label: 'Merchant signature'
-    private_key:
+    test_mobilpay_checkout_private_key:
       type: string
-      label: 'Private key'
-    public_key:
+      label: 'Test Private key'
+    test_mobilpay_checkout_public_key:
       type: string
-      label: 'Public key'
+      label: 'Test Public key'
+    live_mobilpay_checkout_private_key:
+      type: string
+      label: 'Test Private key'
+    live_mobilpay_checkout_public_key:
+      type: string
+      label: 'Test Public key'
