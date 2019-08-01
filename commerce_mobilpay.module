@@ -44,6 +44,3 @@ function commerce_mobilpay_help($route_name, RouteMatchInterface $arg) {
     return $output;
   }
 }
-
-// ha test/live ba vagy akkor a kulcsokat ne kelljen ujbol feltegyed
-
