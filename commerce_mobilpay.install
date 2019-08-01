@@ -11,9 +11,9 @@
 function commerce_mobilpay_requirements($phase) {
   $requirements = [];
   if ($phase == 'install') {
-    if (!class_exists('\RequestAbstract')) {
+    if (!class_exists('\Mobilpay\Payment\Address')) {
       $requirements['commerce_mobilpay_library'] = [
-        'description' => t('Commerce Mobilpay requires the birkof/netopia-mobilpay-bundle library.'),
+        'description' => t('Commerce Mobilpay requires the birkof/netopia-mobilpay library.'),
         'severity' => REQUIREMENT_ERROR,
       ];
     }
