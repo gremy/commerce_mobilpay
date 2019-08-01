@@ -183,11 +183,22 @@ class MobilpayCheckout extends OffsitePaymentGatewayBase implements MobilpayChec
       '#required' => TRUE,
     ];
 
-    $form[$this->pluginId . '_private_key'] = [
-      '#name' => $this->pluginId . '_private_key',
+    $form['test_credentials'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('Test API Credentials'),
+      '#tree' => true,
+      '#states' => [
+        'visible' => [
+          [':input[name="configuration[' . $this->pluginId . '][mode]"]' => ['value' => 'test']],
+        ],
+      ],
+    ];
+
+    $form['test_credentials']['test_' . $this->pluginId . '_private_key'] = [
+      '#name' => 'test_' . $this->pluginId . '_private_key',
       '#type' => 'managed_file',
       '#title' => t('Upload private key'),
-      '#default_value' => [$this->state->get($this->pluginId . '_private_key')],
+      '#default_value' => [$this->state->get('test_' . $this->pluginId . '_private_key')],
       '#description' => t('Upload private key that you received from Mobilpay.(key)'),
       '#upload_validators' => [
         'file_validate_extensions' => ['key'],
@@ -195,11 +206,46 @@ class MobilpayCheckout extends OffsitePaymentGatewayBase implements MobilpayChec
       '#upload_location' => 'private://',
     ];
 
-    $form[$this->pluginId . '_public_key'] = [
-      '#name' => $this->pluginId . '_public_key',
+    $form['test_credentials']['test_' . $this->pluginId . '_public_key'] = [
+      '#name' => 'test_' . $this->pluginId . '_public_key',
       '#type' => 'managed_file',
       '#title' => t('Upload public key'),
-      '#default_value' => [$this->state->get($this->pluginId . '_public_key')],
+      '#default_value' => [$this->state->get('test_' . $this->pluginId . '_public_key')],
+      '#description' => t('Upload public key that you received from Mobilpay.(cer)'),
+      '#upload_validators' => [
+        'file_validate_extensions' => ['cer'],
+      ],
+      '#upload_location' => 'private://',
+    ];
+
+    $form['live_credentials'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('Live API Credentials'),
+      '#tree' => true,
+      '#states' => [
+        'visible' => [
+          [':input[name="configuration[' . $this->pluginId . '][mode]"]' => ['value' => 'live']],
+        ],
+      ],
+    ];
+
+    $form['live_credentials']['live_' . $this->pluginId . '_private_key'] = [
+      '#name' => 'live_' . $this->pluginId . '_private_key',
+      '#type' => 'managed_file',
+      '#title' => t('Upload private key'),
+      '#default_value' => [$this->state->get('live_' . $this->pluginId . '_private_key')],
+      '#description' => t('Upload private key that you received from Mobilpay.(key)'),
+      '#upload_validators' => [
+        'file_validate_extensions' => ['key'],
+      ],
+      '#upload_location' => 'private://',
+    ];
+
+    $form['live_credentials']['live_' . $this->pluginId . '_public_key'] = [
+      '#name' => 'live_' . $this->pluginId . '_public_key',
+      '#type' => 'managed_file',
+      '#title' => t('Upload public key'),
+      '#default_value' => [$this->state->get('live_' . $this->pluginId . '_public_key')],
       '#description' => t('Upload public key that you received from Mobilpay.(cer)'),
       '#upload_validators' => [
         'file_validate_extensions' => ['cer'],
@@ -220,11 +266,15 @@ class MobilpayCheckout extends OffsitePaymentGatewayBase implements MobilpayChec
       $this->state->set('mobilpay.merchant_signature', $keyValues['merchant_signature']);
 
       foreach ($keyValues as $key => $value) {
-        if (strpos($key, $this->pluginId) !== FALSE) {
-          $newFidKey = reset($value);
-          if ($newFidKey) {
-            $this->createFile($newFidKey, $key);
-            $this->state->set($key, $newFidKey);
+        if (strpos($key, 'credentials') !== FALSE) {
+          foreach ($value as $subkey => $subvalue) {
+            if (strpos($subkey, $this->pluginId) !== FALSE) {
+              $newFidKey = reset($subvalue);
+              if ($newFidKey) {
+                $this->createFile($newFidKey, $subkey);
+                $this->state->set($subkey, $newFidKey);
+              }
+            }
           }
         }
       }
@@ -246,9 +296,8 @@ class MobilpayCheckout extends OffsitePaymentGatewayBase implements MobilpayChec
 
     if (isset($envKey) && isset($data)) {
       // Private key path.
-      $fid = $this->state->get($this->pluginId . '_private_key');
-      $file = $this->fileStorage->load($fid);
-      $privateKeyFilePath = $this->fileSystem->realpath($file->getFileUri());
+
+      $privateKeyFilePath = $this->getPrivateKeyFile();
 
       try {
         $objPmReq = RequestAbstract::factoryFromEncrypted($envKey, $data, $privateKeyFilePath);
@@ -415,12 +464,9 @@ class MobilpayCheckout extends OffsitePaymentGatewayBase implements MobilpayChec
       $objPmReqCard->invoice->setBillingAddress($billingAddress);
       $objPmReqCard->invoice->setShippingAddress($billingAddress);
 
-      $fid = $this->state->get($this->pluginId . '_public_key');
-      $file = $this->fileStorage->load($fid);
-
       // This is the path on your server to the public certificate.
-      //eg.   /srv/web/sites/default/files/alice.crt
-      $x509FilePath = $this->fileSystem->realpath($file->getFileUri());
+      //eg.   /srv/web/sites/default/files/mykey.crt
+      $x509FilePath = $this->getPublicKeyFile();
       $objPmReqCard->encrypt($x509FilePath);
 
       $formInfo = [
@@ -516,7 +562,18 @@ class MobilpayCheckout extends OffsitePaymentGatewayBase implements MobilpayChec
    */
   public function getPrivateKeyFile() {
     // Private key path.
-    $fid = $this->state->get($this->pluginId . '_private_key');
+    $fid = $this->state->get($this->getMode() . '_' . $this->pluginId . '_private_key');
+    $file = $this->fileStorage->load($fid);
+    return $this->fileSystem->realpath($file->getFileUri());
+  }
+
+  /**
+   * @return string
+   *   The pubic key path.
+   */
+  public function getPublicKeyFile() {
+    // Public key path.
+    $fid = $this->state->get($this->getMode() . '_' . $this->pluginId . '_public_key');
     $file = $this->fileStorage->load($fid);
     return $this->fileSystem->realpath($file->getFileUri());
   }
