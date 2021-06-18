@@ -3,8 +3,8 @@ type: module
 description: 'Provides Commerce Payment integration for Mobilpay.'
 package: Commerce (contrib)
 core: 8.x
+core_version_requirement: ^8 || ^9
 configure: entity.commerce_payment_gateway.collection
 dependencies:
   - commerce:commerce
   - commerce:commerce_payment
-
